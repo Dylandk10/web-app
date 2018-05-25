@@ -1,0 +1,2 @@
+1) make loop for sending multiple images threw http request
+2) display correct images in order by ranking
