@@ -22,7 +22,8 @@ app.use(function(req, res, next) {
 });
 
 //loop image helper -> mysql -> returns picturenames for restruants in DB -> calls sendDataToHTML function;
-var loopImage = () => {
+var loopImage = (newPictureNumber) => {
+  //newPictureNumber = the picture to be returned
   return new Promise(function (resolveMain, rejectMain) {
     var promise1 = new Promise((resolve, reject) => {
     result = mySqlConn();
@@ -31,23 +32,26 @@ var loopImage = () => {
   //wait for resolve from promise one then take image and loop it
   promise1.then((pictureName) => {
     var folder = './pictures/';
-    var obj = [];
     var promise2 = new Promise((resolve2, reject2) => {
-      //loop threw read files
-      for(var k = 0; k < pictureName.length; k++) {
-        fs.readFile(folder + pictureName[k], "utf8", function(err, fileName) {
-          if(err) {
-            throw err;
-          }
-          console.log('reading file...');
-          //only resolves once...
-          resolve2(fileName);
-        });
-      }
+      fs.readFile(folder + pictureName[newPictureNumber], "utf8", function(err, fileName) {
+        if(err) {
+          throw err;
+        }
+        console.log('reading file...');
+        //only resolves once...
+        resolve2(fileName);
+      });
     });
     //resolves main promise...
     promise2.then((fileName) => {
       console.log('resolving file...');
+      //increment image number
+      newPictureNumber += 1;
+      //if pciture from bd are not resoled call fucntion again
+      if(pictureName.length > newPictureNumber) {
+        console.log(`newPictureNumber ${newPictureNumber}`);
+        loopImage(newPictureNumber);
+      }
       resolveMain(fileName);
     //catch promise2
     }).catch((error2) => {
@@ -73,10 +77,9 @@ app.get('/', (req, res)=> {
 //calls loopimage -> gets data from DB -> returns image -> returns ajax call
 app.get('/pics', (req, res) => {
   return new Promise((resolve, reject) => {
-      var result = loopImage();
+      var result = loopImage(0);
       return resolve(result);
     }).then((image) => {
-    console.log(image.length);
     res.writeHead(200, {'Content-type': 'image/png'});
     res.end(image, 'binary');
   }).catch((err) => {
