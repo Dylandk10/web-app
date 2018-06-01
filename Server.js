@@ -4,6 +4,8 @@ const fs = require('fs');
 const hbs = require('hbs');
 //connecting files
 var {mySqlConn} = require('./mysql/connectMySql.js');
+//front-end find file
+var {mySqlFrontConn} = require('./mysql/frontConnectMySql.js');
 //variables for app
 const port = 3000;
 var app = express();
@@ -47,10 +49,10 @@ var loopImage = (newPictureNumber) => {
       console.log('resolving file...');
       //increment image number
       newPictureNumber += 1;
-      //if pciture from bd are not resoled call fucntion again
+	//if pciture from bd are not resoled call fucntion again
       if(pictureName.length > newPictureNumber) {
-        console.log(`newPictureNumber ${newPictureNumber}`);
-        loopImage(newPictureNumber);
+          console.log(`newPictureNumber ${newPictureNumber}`);
+	  loopImage(newPictureNumber);
       }
       resolveMain(fileName);
     //catch promise2
@@ -70,10 +72,23 @@ var loopImage = (newPictureNumber) => {
   });
 };
 
+//       This is gettig data from db for front-end path      //
+//calls db function returns file path
+var getFrontendPath = () => {
+    return new Promise(function(resolve, reject) {
+	var fileResult = mySqlFrontConn();
+	resolve(fileResult);
+    }).then((fileName) => {
+	return fileName;
+    }).catch((err) => {
+	return err;
+    });
+};
 //homepage render
 app.get('/', (req, res)=> {
   res.render('index.hbs');
 });
+//This is for back-end rendering images
 //calls loopimage -> gets data from DB -> returns image -> returns ajax call
 app.get('/pics', (req, res) => {
   return new Promise((resolve, reject) => {
@@ -85,6 +100,22 @@ app.get('/pics', (req, res) => {
   }).catch((err) => {
       return console.log(`/pic Error: ${err}`);
   });
+});
+
+//this is for front-end rendering pictures
+//returns picturename/filepath for frontend picture
+app.get('/picsFrontend', (req, res) => {
+    console.log("Runnign front-end search");
+    return new Promise((resolve, reject) => {
+	var frontPath = getFrontendPath();
+	resolve(frontPath);
+    }).then((path) => {
+	path = JSON.stringify(path);
+	res.writeHead(200, {'Content-type' : 'text/plain'});
+	res.end(path, 'binary');
+    }).catch((err) => {
+	console.log(`frontend error ${err}`);
+    });
 });
 //set port to listen...
 app.listen(port, () => {
