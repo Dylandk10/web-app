@@ -75,8 +75,22 @@ var oReqFront = new XMLHttpRequest();
 oReqFront.open("GET", 'http://127.0.0.1:3000/picsFrontend', true);
 
 oReqFront.onload = function(oEvent) {
-    var sJson = oReqFront.responseText;
-    console.log(sJson);
+    var sJson = oReqFront.responseText.split(",");
+    var secondList = document.getElementById("minorList");
+    //slices off extra " at begining and end of object
+    for(var i = 0; i < sJson.length; i++) {
+	sJson[i] = sJson[i].slice(1, sJson[i].length -1);
+	var lastChar = sJson[i].substr(sJson[i].length -1);
+	for(var k = 0; k < sJson[i].length; k++) {
+	    if(sJson[i][k] == lastChar && lastChar == '"') {
+		sJson[i] = sJson[i].slice(0, -1);
+	    } else if(sJson[i][0] == '"') {
+		sJson[i] = sJson[i].slice(1, sJson[i].length);
+	    }
+	}
+	secondList.append('<li><img src="../pictures/' + sJson[i] + '"/></li>');
+	console.log(sJson[i]);
+    }
 };
 oReqFront.send();
  
