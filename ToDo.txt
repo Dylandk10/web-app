@@ -1,2 +1,2 @@
-1) make loop for sending multiple images threw http request
-2) display correct images in order by ranking
+1) Make request handler in Server.js for recieving ajax req for DB txt information
+2) Make and align from information ajax req for resturants informationx

@@ -6,6 +6,8 @@ const hbs = require('hbs');
 var {mySqlConn} = require('./mysql/connectMySql.js');
 //front-end find file
 var {mySqlFrontConn} = require('./mysql/frontConnectMySql.js');
+//frontend find all info
+var {mySqlFrontInfoConn} = require('./mysql/frontInfoConnectMySql.js');
 //variables for app
 const port = 3000;
 var app = express();
@@ -84,6 +86,17 @@ var getFrontendPath = () => {
 	return err;
     });
 };
+var getFrontInfoPath = () => {
+    return new Promise((resolve, reject) => {
+	var allResults = mySqlFrontInfoConn();
+	return resolve(allResults);
+    }).then((data)=> {
+	return data;
+    }).catch((err) => {
+	console.log(err);
+	
+    });
+};
 //homepage render
 app.get('/', (req, res)=> {
   res.render('index.hbs');
@@ -117,6 +130,21 @@ app.get('/picsFrontend', (req, res) => {
 	console.log(`frontend error ${err}`);
     });
 });
+
+app.get('/restFrontInformation', (req, res) => {
+    console.log("Runnign froenend info search");
+    return new Promise ((resolve, reject) => {
+	var frontInfoPath = getFrontInfoPath();
+	resolve(frontInfoPath);
+    }).then((data) => {
+	data = JSON.stringify(data);
+	res.writeHead(200, {'Content-type': 'text/plain'});
+	res.end(data, 'binary');
+    }).catch((error) => {
+	console.log(`frontend info error ${error}`);
+    });
+});
+
 //set port to listen...
 app.listen(port, () => {
   console.log(`Starting server on port ${port}`);
