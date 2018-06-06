@@ -44,33 +44,6 @@ class IncomingImage {
 // oReq.send();
 
 
-// // !!!!!!!!!!!OPTION 2!!!!!!!!!!!!!
-// // This works fine but not for multiple png returns...
-
-
-// oReq.responseType = "arraybuffer";
-
-// oReq.onload = function (oEvent) {
-//   console.log(oEvent);
-//   console.log('Running decoder');
-//   var arrayBuffer = oReq.response; // Note: not oReq.responseText
-//   console.log(arrayBuffer);
-//    if (arrayBuffer) {
-//      var byteArray = new Uint8Array(arrayBuffer);
-//      console.log('byteArray', byteArray);
-//      var blob = new Blob([byteArray], {type: "image/png"});
-//      var url = URL.createObjectURL(blob);
-//      var img = new Image();
-//      img.src = url;
-//      console.log('byteArray length', byteArray.length);
-//      console.log('url', url);
-//      document.body.appendChild(img);
-//    }
-// };
-
-// oReq.send();
-
-
 //       THIS IS FOR FRONT-END RENDERING PICTURE        //
 
 var oReqFront = new XMLHttpRequest();
@@ -98,44 +71,83 @@ oReqFront.onload = function(oEvent) {
 	globalPicture.push(sJson[i]);
 	console.log(sJson[i]);
     }
-    return renderImages();
+    return globalPicture;;
 };
 oReqFront.send();
-//selects img classea dn reneders their sources
-function renderImages() {
- // var imageClasses = document.getElementsByClassName("imgLoop");
-    var imageNumber = 0;
-    var imageClasses = null;
-    for(var i = 0; i < globalPicture.length; i++) {
-	imageClasses = document.createElement("img");
-	imageClasses.src = globalPicturePath + globalPicture[imageNumber];
-	imageClasses.style.display = "block";
-	imageNumber++;
-	document.body.appendChild(imageClasses);
-  }
-}
+
 
 //ajax to call DB for all other information name, address etc
 var oReqFrontInformation = new XMLHttpRequest();
 oReqFrontInformation.open("get", 'http://127.0.0.1:3000/restFrontInformation', true);
 
+//global object
+var globalInformation = null;
 oReqFrontInformation.onload = function(oEvent) {
+    //convert JSON to object
     var dbInformation = JSON.parse(oReqFrontInformation.responseText);
     for(var i = 0; i < dbInformation.length; i++) {
 	console.log(dbInformation[i].name);
     }
+    globalInformation = dbInformation;
+    return renderPageInformation();
 };
 
 oReqFrontInformation.send();
+//selects img classea dn reneders their sources
+function renderPageInformation() {
+ // var imageClasses = document.getElementsByClassName("imgLoop");
+    var imageNumber = 0;
+    var imageClasses = null;
+    var restaurantName = null;
+    var restaurantAddress = null;
+    //global picture and global information array same length and order... one loop needed
+    for(var i = 0; i < globalPicture.length; i++) {
+	imageClasses = document.createElement("img");
+	restaurantName = document.createElement("h3");
+	restaurantName.innerHTML = globalInformation[i].name;
+	//id must be set to render restaurants own page
+  	restaurantName.id = globalInformation[i].name;
+	restaurantAddress = document.createElement("p");
+	restaurantAddress.innerHTML = globalInformation[i].address;
+	imageClasses.src = globalPicturePath + globalPicture[imageNumber];
+	imageClasses.style.display = "block";
+	imageNumber++;
+	document.body.appendChild(restaurantName);
+	document.body.appendChild(restaurantAddress);
+	document.body.appendChild(imageClasses);
 
-// function loadDoc() {
-//   var xhttp = new XMLHttpRequest();
-//   xhttp.onreadystatechange = function() {
-//     if (this.readyState == 4 && this.status == 200) {
-// 	console.log(this.responseText);
-//     }
-//   };
-//   xhttp.open("GET", 'http://127.0.0.1:3000/picsFrontend', true);
-//   xhttp.send();
-// }
-// loadDoc();
+	//event handler to render restaurnats page
+	restaurantName.addEventListener("click", function() {
+	    console.log(this.id);
+	});
+    }
+}
+
+
+
+
+// // !!!!!!!!!!!OPTION 2 backend picutre rendering!!!!!!!!!!!!!
+// // This works fine but not for multiple png returns...
+
+
+// oReq.responseType = "arraybuffer";
+
+// oReq.onload = function (oEvent) {
+//   console.log(oEvent);
+//   console.log('Running decoder');
+//   var arrayBuffer = oReq.response; // Note: not oReq.responseText
+//   console.log(arrayBuffer);
+//    if (arrayBuffer) {
+//      var byteArray = new Uint8Array(arrayBuffer);
+//      console.log('byteArray', byteArray);
+//      var blob = new Blob([byteArray], {type: "image/png"});
+//      var url = URL.createObjectURL(blob);
+//      var img = new Image();
+//      img.src = url;
+//      console.log('byteArray length', byteArray.length);
+//      console.log('url', url);
+//      document.body.appendChild(img);
+//    }
+// };
+
+// oReq.send();
