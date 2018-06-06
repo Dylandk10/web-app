@@ -107,6 +107,7 @@ function renderPageInformation() {
 	restaurantName.innerHTML = globalInformation[i].name;
 	//id must be set to render restaurants own page
   	restaurantName.id = globalInformation[i].name;
+	restaurantName.style.cursor = "pointer";
 	restaurantAddress = document.createElement("p");
 	restaurantAddress.innerHTML = globalInformation[i].address;
 	imageClasses.src = globalPicturePath + globalPicture[imageNumber];
@@ -118,7 +119,13 @@ function renderPageInformation() {
 
 	//event handler to render restaurnats page
 	restaurantName.addEventListener("click", function() {
-	    console.log(this.id);
+	    var data = new FormData();
+	    data.append('name', this.id);
+	    console.log(typeof this.id);
+	    var xhttp = new XMLHttpRequest();
+	    xhttp.open("POST", "http://127.0.0.1:3000/loadRestaurantPage", true);
+	    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded; charset=UTF-8");
+	    xhttp.send(data);
 	});
     }
 }

@@ -2,6 +2,7 @@
 const express = require('express');
 const fs = require('fs');
 const hbs = require('hbs');
+var bodyParser = require('body-parser');
 //connecting files
 var {mySqlConn} = require('./mysql/connectMySql.js');
 //front-end find file
@@ -24,6 +25,12 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
+// configure the app to use bodyParser()
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
+
 
 //loop image helper -> mysql -> returns picturenames for restruants in DB -> calls sendDataToHTML function;
 var loopImage = (newPictureNumber) => {
@@ -130,7 +137,7 @@ app.get('/picsFrontend', (req, res) => {
 	console.log(`frontend error ${err}`);
     });
 });
-
+//get and send dbinformation to frontend for main page
 app.get('/restFrontInformation', (req, res) => {
     console.log("Runnign froenend info search");
     return new Promise ((resolve, reject) => {
@@ -143,6 +150,9 @@ app.get('/restFrontInformation', (req, res) => {
     }).catch((error) => {
 	console.log(`frontend info error ${error}`);
     });
+});
+app.post('/loadRestaurantPage', (req, res) => {
+    console.log(req.query.name); 
 });
 
 //set port to listen...
