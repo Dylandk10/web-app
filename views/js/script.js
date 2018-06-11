@@ -120,11 +120,14 @@ function renderPageInformation() {
 	//event handler to render restaurnats page
 	restaurantName.addEventListener("click", function() {
 	    var data = new FormData();
-	    data.append('name', this.id);
-	    console.log(typeof this.id);
 	    var xhttp = new XMLHttpRequest();
+	    var dataName = this.id;
+	    data.append('name', dataName); //send restraunt name && restaurant name is stored as id
+	    for(var key of data.entries()) {
+		console.log(key[0] + ' ' + key[1]);
+	     }
 	    xhttp.open("POST", "http://127.0.0.1:3000/loadRestaurantPage", true);
-	    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded; charset=UTF-8");
+	  //  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded;"); //charset=UTF-8");
 	    xhttp.send(data);
 	});
     }

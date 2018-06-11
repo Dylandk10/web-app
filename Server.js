@@ -3,6 +3,7 @@ const express = require('express');
 const fs = require('fs');
 const hbs = require('hbs');
 var bodyParser = require('body-parser');
+var multer = require('multer');
 //connecting files
 var {mySqlConn} = require('./mysql/connectMySql.js');
 //front-end find file
@@ -12,6 +13,7 @@ var {mySqlFrontInfoConn} = require('./mysql/frontInfoConnectMySql.js');
 //variables for app
 const port = 3000;
 var app = express();
+var upload = multer();
 var http = require('http');
 
 //register partials
@@ -30,6 +32,7 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
+app.use(upload.array());
 
 
 //loop image helper -> mysql -> returns picturenames for restruants in DB -> calls sendDataToHTML function;
@@ -151,8 +154,11 @@ app.get('/restFrontInformation', (req, res) => {
 	console.log(`frontend info error ${error}`);
     });
 });
-app.post('/loadRestaurantPage', (req, res) => {
-    console.log(req.query.name); 
+app.post('/loadRestaurantPage', upload.array(), (req, res, next) => {
+    let formData = req.body;
+    console.log(formData);
+    console.log(req.file);
+    next( res.sendStatus(200) );
 });
 
 //set port to listen...
