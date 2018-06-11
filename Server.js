@@ -10,6 +10,8 @@ var {mySqlConn} = require('./mysql/connectMySql.js');
 var {mySqlFrontConn} = require('./mysql/frontConnectMySql.js');
 //frontend find all info
 var {mySqlFrontInfoConn} = require('./mysql/frontInfoConnectMySql.js');
+//find one restaurant from db
+var {mySqlFindRestaurant} = require('./mysql/mySqlFindRestaurant.js');
 //variables for app
 const port = 3000;
 var app = express();
@@ -154,11 +156,22 @@ app.get('/restFrontInformation', (req, res) => {
 	console.log(`frontend info error ${error}`);
     });
 });
-app.post('/loadRestaurantPage', upload.array(), (req, res, next) => {
-    let formData = req.body;
-    console.log(formData);
-    console.log(req.file);
-    next( res.sendStatus(200) );
+app.post('/loadRestaurantPage', (req, res) => {
+    let formData = req.body.name;
+    return new Promise((resolve, reject) => {
+	var findRestaurant = mySqlFindRestaurant(formData);
+	resolve(findRestaurant);
+    }).then((restaurantName) => {
+	console.log(restaurantName[0].name);
+	    res.render('restaurantPage.hbs', {
+	    restaurantMainName: restaurantName[0].name,
+	    restaurantAddress: restaurantName[0].address,
+	    restaurantRating: restaurantName[0].rating,
+	    restaurantNumber: restaurantName[0].phone_number
+	});
+    }).catch((error) => {
+	console.log(`Error on /loadRestaurantPage`);
+    });
 });
 
 //set port to listen...

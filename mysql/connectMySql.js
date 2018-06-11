@@ -40,9 +40,9 @@ var mySqlConn = () => {
   dataResult().then((data) => {
   return data;
   }).catch((err) => {
-    return err
+      return err;
   });
-}
+};
 module.exports = {
   mySqlConn
-}
+};
