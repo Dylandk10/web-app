@@ -120,15 +120,23 @@ function renderPageInformation() {
 	//event handler to render restaurnats page
 	restaurantName.addEventListener("click", function() {
 	    var data = new FormData();
-	    var xhttp = new XMLHttpRequest();
+	    var xhttp2 = new XMLHttpRequest();
 	    var dataName = this.id;
 	    data.append('name', dataName); //send restraunt name && restaurant name is stored as id
 	    for(var key of data.entries()) {
 		console.log(key[0] + ' ' + key[1]);
 	     }
-	    xhttp.open("POST", "http://127.0.0.1:3000/loadRestaurantPage", true);
-	  //  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded;"); //charset=UTF-8");
-	    xhttp.send(data);
+
+	    xhttp2.open("POST","http://127.0.0.1:3000/loadRestaurantPage/restaurantName/" + dataName, true);
+	    //no need to set header its automaticlly set
+
+	    xhttp2.onload = function() {
+		var restaurantInfo = JSON.parse(xhttp2.responseText);
+		console.log(xhttp2);
+		console.log(restaurantInfo[0].name);
+		window.location.href = "/restPage/" + restaurantInfo[0].name;
+	    };
+	    xhttp2.send();
 	});
     }
 }

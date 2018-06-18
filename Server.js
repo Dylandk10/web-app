@@ -156,24 +156,39 @@ app.get('/restFrontInformation', (req, res) => {
 	console.log(`frontend info error ${error}`);
     });
 });
-app.post('/loadRestaurantPage', (req, res) => {
-    let formData = req.body.name;
+
+//connected to app.post below to get info then app.get is to render page
+app.get('/restPage/:restaurantName', (req, res) => {
+    console.log("running get rest page");
+    var param = req.params.restaurantName;
     return new Promise((resolve, reject) => {
-	var findRestaurant = mySqlFindRestaurant(formData);
+	var findRestaurant = mySqlFindRestaurant(param);
 	resolve(findRestaurant);
-    }).then((restaurantName) => {
-	console.log(restaurantName[0].name);
-	    res.render('restaurantPage.hbs', {
-	    restaurantMainName: restaurantName[0].name,
-	    restaurantAddress: restaurantName[0].address,
-	    restaurantRating: restaurantName[0].rating,
-	    restaurantNumber: restaurantName[0].phone_number
+    }).then((restName) => {
+	res.render('restaurantPage.hbs',{
+	    restaurantMainName: restName[0].name,
+	    restaurantAddress: restName[0].address,
+	    restaurantRating: restName[0].rating,
+	    restaurantNumber: restName[0].phone_number
 	});
-    }).catch((error) => {
-	console.log(`Error on /loadRestaurantPage`);
+    }).catch((err) => {
+	console.log(`Error on get restPage ${err}`);
     });
 });
-
+//post request but with dynamic url params calls app.get ubove to render page...
+app.post('/loadRestaurantPage/restaurantName/:restaurantName', (req, res) => {
+    var param = req.params.restaurantName;
+    console.log(req.params.restaurantName);
+    return new Promise((resolve, reject) => {
+	var findRestaurant = mySqlFindRestaurant(param);
+	resolve(findRestaurant);
+    }).then((restaurantName) => {
+	console.log(restaurantName);
+	res.send(restaurantName);
+    }).catch((error) => {
+	console.log(`Error on /loadRestaurantPage:restaurantName`, error);
+    });
+});
 //set port to listen...
 app.listen(port, () => {
   console.log(`Starting server on port ${port}`);
